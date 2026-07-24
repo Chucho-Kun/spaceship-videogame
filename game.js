@@ -62,6 +62,13 @@ const RADII  = [0, 16, 30, 50];   // por tamaño 1, 2, 3
 const SPEEDS = [0, 85, 55, 32];   // velocidad base por tamaño
 const POINTS = [0, 100, 50, 20];  // puntos por tamaño
 
+// Forma fija (silueta clásica con muesca cóncava), normalizada a radio ~1
+const CLASSIC_SHAPE = [
+  [-0.08, -1.07], [0.59, -0.79], [0.47, -0.16], [1.11, 0.00],
+  [0.83, 0.67], [0.08, 1.07], [-0.67, 0.75], [-1.11, 0.08], [-0.95, -0.51],
+];
+const CLASSIC_SHAPE_CHANCE = 0.25; // probabilidad de usar la forma fija en vez de una aleatoria
+
 class Asteroid {
   constructor(x, y, size = 3) {
     this.x    = x;
@@ -77,13 +84,17 @@ class Asteroid {
     this.rotSpeed = rand(-1.2, 1.2);
     this.rot = rand(0, Math.PI * 2);
 
-    // Polígono irregular
-    const n = randInt(8, 13);
-    this.verts = [];
-    for (let i = 0; i < n; i++) {
-      const a = (i / n) * Math.PI * 2;
-      const r = this.radius * rand(0.6, 1.0);
-      this.verts.push([Math.cos(a) * r, Math.sin(a) * r]);
+    if (Math.random() < CLASSIC_SHAPE_CHANCE) {
+      this.verts = CLASSIC_SHAPE.map(([x, y]) => [x * this.radius, y * this.radius]);
+    } else {
+      // Polígono irregular
+      const n = randInt(8, 13);
+      this.verts = [];
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const r = this.radius * rand(0.6, 1.0);
+        this.verts.push([Math.cos(a) * r, Math.sin(a) * r]);
+      }
     }
   }
 
